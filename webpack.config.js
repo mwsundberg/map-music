@@ -1,15 +1,32 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
 
-var APP_DIR = path.resolve(__dirname, 'src/');
-var BUILD_DIR = path.resolve(__dirname, 'docs/dist/');
 
-var config = {
-	mode: 'production',
+const APP_DIR = path.resolve(__dirname, 'src/');
+const BUILD_DIR = path.resolve(__dirname, 'docs/dist/');
+
+const config = {
+	mode: 'development',
 	entry: APP_DIR + '/index.jsx',
+
 	output: {
 		path: BUILD_DIR,
 		filename: 'bundle.js'
+	},
+	module: {
+		rules: [
+			// Pass all js files through babel (with react as well)
+			{
+				test: /\.m?jsx?$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: ['@babel/preset-env', '@babel/preset-react']
+					}
+				}
+			}
+		]
 	}
 };
 
