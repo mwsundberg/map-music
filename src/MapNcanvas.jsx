@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import L, {Map, TileLayer, PolyLine} from 'react-leaflet';
 import {resizeArray} from './helpers';
-import {Selector} from './FormComponents';
+import {Selector, ButtonGroup} from './FormComponents';
 
 // The upper-right corner histogram of elevations
 class Histogram extends Component {
@@ -46,13 +46,13 @@ class Button extends Component {
 const MAP_URL_TERRAIN = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
 const MAP_URL_RGB_ELEVATION = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token={accessToken}";
 const MAP_ACCESS_TOKEN = "pk.eyJ1IjoibXdzdW5kYmVyZyIsImEiOiJjazI4Z3lkcHkwb3pzM2RwYm44YW9nM2ZuIn0.EyqGj9GuiUpvoauajxVPgA";
-class MapDrawingArea extends Component<{}> {
+class MapDrawingArea extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			center: this.props.center,
-			zoom: this.props.zoom,
+			center: this.props.presetView.coordinates,
+			zoom: this.props.presetView.zoom,
 			painting: false
 		}
 
@@ -200,8 +200,8 @@ class MapDrawingArea extends Component<{}> {
 					</canvas>
 				}
 				<Map ref={m => { this.map = m.leafletElement;}}
-					center={this.props.center}
-					zoom={this.props.zoom}
+					center={this.props.presetView.coordinates}
+					zoom={this.props.presetView.zoom}
 					onZoomend={this.onZoomEnd}
 					onMoveend={this.handleMoveEnd}>
 					<TileLayer
@@ -230,9 +230,12 @@ class MapDrawingWithControls extends Component {
 		super(props);
 		this.state = {
 			drawing: false,
-			loadedLocation: null,
-			loadedZoom: null
+			loadedMapView: null,
+			mapViewPresetsArray: null
 		};
+
+		// Bind Listeners
+		this.locationPresetSelection = this.locationPresetSelection.bind(this);
 	}
 
 	// Handle mounting and unmounting (canvas click listeners?)
@@ -244,24 +247,29 @@ class MapDrawingWithControls extends Component {
 		console.log("Unmounting MapDrawingArea");
 	}
 
+	// When the saved location selector updates
+	locationPresetSelection(location){
+		// Update state
+		this.setState({
+			loadedMapView: location
+		})
+	}
 	render() {
 		return (
 			<div id="mapToolbar" class="containerPadded">
 				Select mode:
-				<div class="buttonGroup">
-				    <input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">&#xf256; Panning</label>
-				    <input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">&#xf1fc; Drawing</label>
-				</div>
+				<ButtonGroup>
+					<input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">&#xf256; Panning</label>
+					<input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">&#xf1fc; Drawing</label>
+				</ButtonGroup>
 				&emsp;
-				<label for="locationSelect">Load a location:</label>
-				<select id="locationSelect" name="locationSelect" autocomplete="off">
-				</select>
+				<Selector label="Load a location: " options={this.state.mapViewPresetsArray} selected={this.state.loadedMapView} onSelection={this.locationPresetSelection}/>
 				&emsp;
 				<label for="saveLocationName">Bookmark current location:</label>
 				<input type="text" id="saveLocationName" name="saveLocationName" autocomplete="off" placeholder="Location Save Name">
 				<input type="button" name="saveLocationButton" value="Save">
 			</div>
-			<MapDrawingArea height={100} width={100} center={this.state.loadedLocation} zoom={this.state.loadedZoom} drawing={this.state.drawing} />
+			<MapDrawingArea height={100} width={100} presetView={this.state.loadedMapView} drawing={this.state.drawing} />
 		);
 	}
 }
