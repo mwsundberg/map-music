@@ -342,7 +342,7 @@ function canvasActivelyDrawing(offsetX, offsetY) {
 			mapCanvasContext.stroke();
 		}
 	}
-};
+}
 
 // Closing off a path
 mapCanvasDOM.onmouseup = canvasFinishedDrawing;
@@ -381,7 +381,7 @@ function canvasFinishedDrawing(e) {
 	mapCanvasContext.clearRect(0, 0, mapCanvasContext.canvas.width, mapCanvasContext.canvas.height); // Clears the canvas
 	painting = false;
 	lineCoordinates = [];
-};
+}
 
 // Audio config options pane submit action
 $id("addStagedAudio").onclick = function(e) {
