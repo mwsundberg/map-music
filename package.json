@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/nathreed/MapMusic#readme",
   "dependencies": {
-    "leaflet": "^1.5.1",
+    "leaflet": "^1.6.0",
     "leaflet-tilelayer-colorpicker": "^0.1.0",
     "number-to-words": "^1.2.4",
     "react": "^16.12.0",
@@ -31,6 +31,7 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-react": "^7.8.3",
     "babel-loader": "^8.0.6",
+    "babel-plugin-transform-react-pug": "^7.0.1",
     "sass": "^1.23.1",
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11",

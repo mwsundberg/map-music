@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import L, {Map, TileLayer, PolyLine} from 'react-leaflet';
+import {Map, TileLayer, PolyLine} from 'react-leaflet';
+import L from 'leaflet';
 import {resizeArray} from './helpers';
 import {Selector, ButtonGroup} from './FormComponents';
 
