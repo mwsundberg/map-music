@@ -41,4 +41,9 @@ export const ButtonGroup = (props) => {
 			{props.children}
 		</div>
 	);
-}
+};
+
+// Standard issue button
+export const Button = (props) => {
+	return <input type="button" onClick={props.onClick} value={props.label}/>;
+};
