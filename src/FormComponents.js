@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, {Component, PureComponent} from 'react';
 
 // A dropdown selector option
-// <Selector label={"Select Label: "}
+// <Selector label="Select Label: "
 //		options={[{name: "something", etc:"etc"}, {name: "something2", etc:"etc"}]}
 //		selected={{name: "something", etc:"etc"}}
 //		onSelection={(selectedVal)={doSomething}} />
-export class Selector extends Component {
+export class Selector extends PureComponent {
 	constructor(props){
 		super(props);
 
@@ -16,7 +16,7 @@ export class Selector extends Component {
 	// Update the internal values upon selection change
 	handleChange(e){
 		// Pass the value up through the listener
-		this.props.onSelection(props.options[e.target.value]);
+		this.props.onSelection(this.props.options[e.target.value]);
 	}
 
 	render() {
@@ -25,9 +25,9 @@ export class Selector extends Component {
 		return (
 			<label>{this.props.label}
 				<select ref="selectRef" value={options.indexOf(this.props.selected)} onChange={this.handleChange}>
-					{options.map((item, index) => {
+					{options.map((item, index) => 
 						<option key={index} value={index}>{item.name}</option>
-					})}
+					)}
 				</select>
 			</label>
 			);

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Coords} from './helpers';
 
 const DRAFTING_LINE_COLOR = "#525442";
 const DRAWING_RESOLUTION = 2;
-export default class CanvasDrawing extends React.Component {
+export default class CanvasDrawing extends Component {
 	constructor(props){
 		super(props);
 
@@ -31,6 +31,11 @@ export default class CanvasDrawing extends React.Component {
 
 	// Setting up from first click
 	onCanvasStartDrawing(e) {
+		// Only start drawing when the primary button is clicked
+		if(e.buttons != 1){
+			return;
+		}
+
 		// Get the current location from the event (the real one, not the fake one)
 		const mouse = new Coords(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
 
@@ -39,16 +44,26 @@ export default class CanvasDrawing extends React.Component {
 		this.ctx.moveTo(mouse.x, mouse.y);
 
 		// Update state
-		this.setState((state, props) => {
-			return {
+		this.setState({
 				painting: true,
 				points: [mouse]
-			};
 		});
 	}
 
 	// While drawing interpolate points to have evenly spaced coordinates
 	onCanvasActivelyDrawing(e){
+		// If click drag somehow is entering the canvas, initialize things
+		if(!this.state.painting && e.buttons == 1){
+			this.onCanvasStartDrawing(e);
+			return;
+		}
+
+		// If the drag enters the canvas and is not still drawing, don't keep drawing
+		if(this.state.painting && e.buttons != 1){
+			this.onCanvasFinishedDrawing(e);
+			return;
+		}
+
 		// Do nothing when not painting
 		if(!this.state.painting){
 			return;
@@ -88,23 +103,8 @@ export default class CanvasDrawing extends React.Component {
 
 	// Call props.onLineDrawn when done and clear the screen
 	onCanvasFinishedDrawing(e){
-		// Get the current location from the event (the real one, not the fake one), and the canvas size from the props
-		const mouse = new Coords(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-		const {height, width} = this.props;
-
-		// End drawing
-		this.ctx.lineTo(mouse.x, mouse.y);
-		this.ctx.stroke();
-
-		// Update state 
-		this.setState((state, props) => {
-			// Do the deed here:
-			state.points.push(mouse);
-			return {
-				// Update it here (since push is a bitch)
-				points: state.points
-			};
-		})
+		// Extract the height and width from the properties
+		const {width, height} = this.props;
 
 		// Scale the coordinates to 0-1 and pass it up to the listener
 		const scaledLine = this.state.points.map((point) => {
