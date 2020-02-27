@@ -32,7 +32,7 @@ export class Coords {
 		this.y = y;
 
 		// Properties
-		this.magnitude = Math.sqrt(x**2 + y**2);
+		this.magnitude = this.distanceTo({x: 0, y: 0});
 
 		// Function bindings
 		this.scaled = this.scaled.bind(this);
@@ -53,9 +53,9 @@ export class Coords {
 		return new Coords(this.x-other.x, this.y-other.y);
 	}
 	distanceTo(other) {
-		return Math.sqrt((this.x - other.x)**2 + (this.y - other.y)**2);
+		return Math.sqrt((this.x - other.x)**2 + (this.y - other.y)**2)
 	}
 	normalized() {
-		return new Coords(this.x/this.magnitude, this.y/this.magnitude);
+		return this.scaled(1 / this.magnitude);
 	}
 }

@@ -10,7 +10,6 @@ export default class CanvasDrawing extends React.Component {
 		// Setup state
 		this.state = {
 			painting: false,
-			lastPoint: null,
 			points: []
 		}
 
@@ -32,22 +31,20 @@ export default class CanvasDrawing extends React.Component {
 
 	// Setting up from first click
 	onCanvasStartDrawing(e) {
-		// Get the current location from the event
-		console.log("bitch?");
-		const mouse = new Coords(e.offsetX, e.offsetY);
+		// Get the current location from the event (the real one, not the fake one)
+		const mouse = new Coords(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
 
 		// Start drawing
 		this.ctx.beginPath();
 		this.ctx.moveTo(mouse.x, mouse.y);
 
 		// Update state
-		this.setState(state => {
+		this.setState((state, props) => {
 			return {
 				painting: true,
-				lastPoint: mouse,
-				points: state.points.push(mouse)
+				points: [mouse]
 			};
-		})
+		});
 	}
 
 	// While drawing interpolate points to have evenly spaced coordinates
@@ -57,38 +54,42 @@ export default class CanvasDrawing extends React.Component {
 			return;
 		}
 
-		// Get the current location from the event
-		const mouse = new Coords(e.offsetX, e.offsetY);
+		// Get the current location from the event (the real one, not the fake one), and the previous one from state
+		const mouse = new Coords(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+		const lastPoint = this.state.points[this.state.points.length - 1];
 
 		// Calculate the vector from the previous point to the mouse location (since want to have evenly spaced points)
-		console.log("idk bruh")
-		const direction = (mouse.minus(this.state.lastPoint)).normalized();
+		const direction = (mouse.minus(lastPoint)).normalized();
 		const deltaStep = direction.scaled(DRAWING_RESOLUTION);
-		console.log("Bitch please")
 
 		// If greater than the distance criteria, draw set length lines towards current mouse location until too close
-		while(mouse.distanceTo(this.state.lastPoint) >= DRAWING_RESOLUTION){
-			console.log("Distance to: " + mouse.distanceTo(this.state.lastPoint));
-
+		let pointsToAdd = [lastPoint];
+		for(let point = pointsToAdd[0]; mouse.distanceTo(point) >= DRAWING_RESOLUTION; point = pointsToAdd[pointsToAdd.length - 1]){
 			// Calculate a new point DRAWING_RESOLUTION closer to the mouse location
-			const newPoint = this.state.lastPoint.plus(deltaStep);
-
-			// Interpolate a point a step away from the last point
-			this.setState({
-				lastPoint: newPoint,
-				points: state.points.push(newPoint)
-			});
+			const newPoint = point.plus(deltaStep);
+			pointsToAdd.push(newPoint);
 		}
 
+		// Get the state in line, removing the already included lastPoint then adding it
+		pointsToAdd.shift()
+		this.setState((state, props) =>{
+			// Do the deed here:
+			state.points.push(...pointsToAdd);
+			return {
+				// Update it here (since push is a bitch)
+				points: state.points
+			};
+		});
+
 		// Draw the line from the last left point to the "lastPoint", which is the one closest to the threshold
-		this.ctx.lineTo(this.state.lastPoint.x, this.state.lastPoint.y);
+		this.ctx.lineTo(lastPoint.x, lastPoint.y);
 		this.ctx.stroke();
 	}
 
 	// Call props.onLineDrawn when done and clear the screen
 	onCanvasFinishedDrawing(e){
-		// Get the current location from the event and the canvas size from the props
-		const mouse = new Coords(e.offsetX, e.offsetY);
+		// Get the current location from the event (the real one, not the fake one), and the canvas size from the props
+		const mouse = new Coords(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
 		const {height, width} = this.props;
 
 		// End drawing
@@ -96,20 +97,24 @@ export default class CanvasDrawing extends React.Component {
 		this.ctx.stroke();
 
 		// Update state 
-		this.setState(state => {
-			return {points: state.points.push(mouse)};
+		this.setState((state, props) => {
+			// Do the deed here:
+			state.points.push(mouse);
+			return {
+				// Update it here (since push is a bitch)
+				points: state.points
+			};
 		})
 
 		// Scale the coordinates to 0-1 and pass it up to the listener
 		const scaledLine = this.state.points.map((point) => {
-			new Coords(point.x/width, point.y/height)
+			return new Coords(point.x/width, point.y/height);
 		});
 		this.props.onLineDrawn(scaledLine);
 
 		// Reset the state to be blank
 		this.setState({
 			painting: false,
-			lastPoint: null,
 			points: []
 		});
 
