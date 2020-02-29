@@ -31,6 +31,8 @@ export default class CanvasDrawing extends Component {
 
 	// Setting up from first click
 	onCanvasStartDrawing(e) {
+		e.preventDefault();
+
 		// Only start drawing when the primary button is clicked
 		if(e.buttons != 1){
 			return;
@@ -52,6 +54,8 @@ export default class CanvasDrawing extends Component {
 
 	// While drawing interpolate points to have evenly spaced coordinates
 	onCanvasActivelyDrawing(e){
+		e.preventDefault();
+
 		// If click drag somehow is entering the canvas, initialize things
 		if(!this.state.painting && e.buttons == 1){
 			this.onCanvasStartDrawing(e);
@@ -103,6 +107,8 @@ export default class CanvasDrawing extends Component {
 
 	// Call props.onLineDrawn when done and clear the screen
 	onCanvasFinishedDrawing(e){
+		e.preventDefault();
+		
 		// Extract the height and width from the properties
 		const {width, height} = this.props;
 

@@ -1,5 +1,5 @@
 // Scale the length of an array with linear interpolation
-export function resizeArray(data, newLength) {
+export function arrayResize(data, newLength) {
 	let indexScalar = (data.length - 1) / (newLength - 1);
 	let resultData = [];
 
@@ -23,6 +23,13 @@ export function resizeArray(data, newLength) {
 	resultData[newLength - 1] = data[data.length - 1];
 
 	return resultData;
+}
+
+// Scale the values of a numeric array to a 0-1 scale
+export function arrayScaleToOne(data) {
+	const min = Math.min(...data);
+	const range = Math.max(...data) - min;
+	return data.map(value => ((value - min) / range));
 }
 
 // A pseudo-vector pseudo-point object type

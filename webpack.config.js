@@ -7,7 +7,7 @@ const BUILD_DIR = path.resolve(__dirname, 'docs/dist/');
 
 const config = {
 	mode: 'development',
-	entry: APP_DIR + '/testing.jsx',
+	entry: APP_DIR + '/testing.js',
 
 	output: {
 		path: BUILD_DIR,

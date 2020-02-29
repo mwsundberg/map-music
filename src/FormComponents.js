@@ -30,14 +30,14 @@ export class Selector extends PureComponent {
 					)}
 				</select>
 			</label>
-			);
+		);
 	}
 }
 
 // Syntactic sugar for button groups
 export const ButtonGroup = (props) => {
 	return(
-		<div className="buttonGroup">
+		<div className="buttonGroup" {...props}>
 			{props.children}
 		</div>
 	);
